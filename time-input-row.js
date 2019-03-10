@@ -30,7 +30,7 @@ class TimeInputRow extends Polymer.Element {
     this._hass = hass;
     let stateObj = hass.states[this._config.entity];
     if(stateObj) {
-      this.hour = stateObj.attributes.hour;
+      this.hour = ("0" + stateObj.attributes.hour).slice(-2);
       this.minute = ("0" + stateObj.attributes.minute).slice(-2);
     }
   }

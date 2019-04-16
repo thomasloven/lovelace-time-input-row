@@ -3,7 +3,7 @@ time-input-row
 
 Change the value of an  [`input_datetime`](https://www.home-assistant.io/components/input_datetime/) right on a lovelace card.
 
-![time-input-row](https://user-images.githubusercontent.com/1299821/56157264-59b5f500-5fbf-11e9-8ed8-2afcca4a3341.png)
+![datetime](https://user-images.githubusercontent.com/1299821/56205651-aabefb00-604a-11e9-9d0c-f407037c1c0e.jpg)
 
 
 # Installation instructions
@@ -68,6 +68,9 @@ input_datetime:
     has_time: true
     initial: "2019-04-01 12:34:00"
 ```
+
+### Secret feature
+If you want to see something funny, add the property `silly_format: true`. Can you believe some people actually *want* it this way?
 
 
 ---

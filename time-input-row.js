@@ -8,7 +8,77 @@ class TimeInputRow extends cardTools.LitElement {
     };
   }
 
+  static get styles() {
+    return cardTools.LitCSS`
+    .time-input-wrap {
+      display: flex;
+      flex-direction: row;
+    }
+    paper-input {
+      text-align: center;
+    }
+    `;
+  }
+
   render() {
+    const year = cardTools.LitHtml`
+      <paper-input
+      id="year"
+      type="number"
+      no-label-float=""
+      maxlength="4"
+      max="9999"
+      min="0"
+      auto-validate="true"
+      value="${this.getYear()}"
+      style="width: 50px;"
+      @click="${(ev) => ev.stopPropagation()}"
+      @change="${this.valueChanged}"
+      >
+      <span suffix slot="suffix">
+        ${this.iso ? `-` : ``}
+      </span>
+      </paper-input>
+    `
+    const month = cardTools.LitHtml`
+      <paper-input
+      id="month"
+      type="number"
+      no-label-float=""
+      maxlength="4"
+      max="12"
+      min="01"
+      auto-validate="true"
+      value="${this.getMonth()}"
+      style="width: 30px;"
+      @click="${(ev) => ev.stopPropagation()}"
+      @change="${this.valueChanged}"
+      >
+      <span suffix slot="suffix">
+        ${this.iso ? `-` : `/`}
+      </span>
+      </paper-input>
+    `
+    const day = cardTools.LitHtml`
+      <paper-input
+      id="day"
+      type="number"
+      no-label-float=""
+      maxlength="4"
+      max="31"
+      min="01"
+      auto-validate="true"
+      value="${this.getDay()}"
+      style="width: 30px;"
+      @click="${(ev) => ev.stopPropagation()}"
+      @change="${this.valueChanged}"
+      >
+      <span suffix slot="suffix">
+        ${this.iso ? `` : `/`}
+      </span>
+      </paper-input>
+    `
+
     return cardTools.LitHtml`
     <hui-generic-entity-row
     .hass="${this._hass}"
@@ -16,24 +86,27 @@ class TimeInputRow extends cardTools.LitElement {
     >
       ${this.stateObj.attributes.has_date === true ?
         cardTools.LitHtml`
-        <vaadin-date-picker
-        id="date"
-        @value-changed="${this.valueChanged}"
-        value="${this.getDateString()}"
-        @click="${(ev) => ev.stopPropagation()}"
-        ></vaadin-date-picker>
+        <div class="time-input-wrap">
+          ${this.iso ?
+            cardTools.LitHtml`${year}${month}${day}` :
+            cardTools.LitHtml`${month}${day}${year}`}
+        </div>
         ` : ``}
+
+      ${this.stateObj.attributes.has_time === true &&
+      this.stateObj.attributes.has_date === true ? `,` : ``}
 
       ${this.stateObj.attributes.has_time === true ?
       cardTools.LitHtml`
         <paper-time-input
         .hour="${this.getHour()}"
         .min="${this.getMinute()}"
+        .amPm="${this.getAMPM()}"
         @change="${this.valueChanged}"
         @click="${(ev) => ev.stopPropagation()}"
         id="time"
         hide-label="true"
-        format="24"
+        format="${this.iso ? '24' : '12'}"
         ></paper-time-input>
       ` : ``}
 
@@ -48,17 +121,41 @@ class TimeInputRow extends cardTools.LitElement {
   setConfig(config) {
     this.active = false
     this._config = config;
+    this.iso = !config.silly_format;
   }
 
   getHour() {
     if(this.stateObj.state === "unknown")
       return "";
-    return ("0" + this.stateObj.attributes.hour).slice(-2);
+    return ("0" + (this.iso ?
+      this.stateObj.attributes.hour :
+      this.stateObj.attributes.hour%12)
+    ).slice(-2);
   }
   getMinute() {
     if(this.stateObj.state === "unknown")
       return "";
     return ("0" + this.stateObj.attributes.minute).slice(-2);
+  }
+  getYear() {
+    if(this.stateObj.state === "unknown")
+      return "";
+    return this.stateObj.attributes.year;
+  }
+  getMonth() {
+    if(this.stateObj.state === "unknown")
+      return "";
+    return ("0" + this.stateObj.attributes.month).slice(-2);
+  }
+  getDay() {
+    if(this.stateObj.state === "unknown")
+      return "";
+    return ("0" + this.stateObj.attributes.day).slice(-2);
+  }
+  getAMPM() {
+    if(this.stateObj.state === "unknown")
+      return "";
+    return (this.stateObj.attributes.hour < 12) ? "AM" : "PM";
   }
 
   getDateString() {
@@ -77,10 +174,18 @@ class TimeInputRow extends cardTools.LitElement {
     let param = {
       entity_id: this._config.entity,
     };
-    if(this.stateObj.attributes.has_time)
-      param.time = this.shadowRoot.querySelector("#time").value.trim() + ":00";
+    if(this.stateObj.attributes.has_time) {
+      const timeEl = this.shadowRoot.querySelector("#time");
+      param.time = "" +
+        (parseInt(timeEl.hour) +
+          (!this.iso && timeEl.amPm == "PM" ? 12 : 0)) + ":" +
+        timeEl.min + ":00";
+    }
     if(this.stateObj.attributes.has_date)
-      param.date = this.shadowRoot.querySelector("#date").value;
+      param.date = "" +
+        this.shadowRoot.querySelector("#year").value + "-" +
+        this.shadowRoot.querySelector("#month").value + "-" +
+        this.shadowRoot.querySelector("#day").value;
     this._hass.callService('input_datetime', 'set_datetime', param);
   }
 

@@ -10,6 +10,11 @@ class TimeInputRow extends cardTools.LitElement {
 
   static get styles() {
     return cardTools.LitCSS`
+    :host {
+      --paper-input-container-shared-input-style_-_-webkit-appearance: textfield;
+      --paper-input-container-shared-input-style_-_-moz-appearance: textfield;
+      --paper-input-container-shared-input-style_-_appearance: textfield;
+    }
     .time-input-wrap {
       display: flex;
       flex-direction: row;
@@ -39,7 +44,7 @@ class TimeInputRow extends cardTools.LitElement {
         ${this.iso ? `-` : ``}
       </span>
       </paper-input>
-    `
+    `;
     const month = cardTools.LitHtml`
       <paper-input
       id="month"
@@ -58,7 +63,7 @@ class TimeInputRow extends cardTools.LitElement {
         ${this.iso ? `-` : `/`}
       </span>
       </paper-input>
-    `
+    `;
     const day = cardTools.LitHtml`
       <paper-input
       id="day"
@@ -77,7 +82,7 @@ class TimeInputRow extends cardTools.LitElement {
         ${this.iso ? `` : `/`}
       </span>
       </paper-input>
-    `
+    `;
 
     return cardTools.LitHtml`
     <hui-generic-entity-row

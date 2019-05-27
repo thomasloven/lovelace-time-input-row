@@ -1,6 +1,12 @@
 time-input-row
 ==============
 
+# DEPRECATED!
+
+# time-input-row is now a standard feature of lovelace
+
+# no support is given for this project
+
 Change the value of an  [`input_datetime`](https://www.home-assistant.io/components/input_datetime/) right on a lovelace card.
 
 ![datetime](https://user-images.githubusercontent.com/1299821/56205651-aabefb00-604a-11e9-9d0c-f407037c1c0e.jpg)
